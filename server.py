@@ -84,17 +84,20 @@ class MyWebServer(socketserver.BaseRequestHandler):
         http_method= lheader[0]
         if http_method not in ACCEPTED_REQUEST:
             self.respond(405)
+            return
             
         try:
             path = self.resolve_path(lheader[1])
         except Exception:
             self.respond(404)
+            return
             
         original_path = '' + path
         path = './www'+path
         
         if not op.exists(path):
             self.respond(404)
+            return
             
         def get_text(fp):
             with open(fp) as f:
@@ -115,7 +118,6 @@ class MyWebServer(socketserver.BaseRequestHandler):
             self.respond(200, ['html', text])
             return
         
-        # if op.isfile(path):
         text = get_text(path)
         
         if text is None or text == '':
@@ -131,13 +133,7 @@ class MyWebServer(socketserver.BaseRequestHandler):
             
         # unexpected filetype requested, thus reject
         self.respond(404)
-        
-        
-        
-        
-        
-        # print ("Got a request of: %s\n" % self.data)       
-        # self.request.sendall(bytearray("OK", self.enc))
+        return
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8080
